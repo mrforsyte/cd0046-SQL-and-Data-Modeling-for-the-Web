@@ -27,6 +27,21 @@ db = SQLAlchemy(app)
 # Models.
 #----------------------------------------------------------------------------#
 
+class Availability(db.Model):
+    
+    __tablename__ = 'availability'
+    
+    id = db.Column(db.Integer,primary_key=True)
+    working_period_start = db.Column(db.DateTime)
+    working_period_end = db.Column(db.DateTime)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
+    artist = db.relationship('Artist', backref='avialabilities')
+    
+    def __repr__(self):
+        return f'<Availability {self.id}: {self.working_period_start} -> {self.working_periond_end}>'
+
+
+
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -56,6 +71,21 @@ class Artist(db.Model):
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+class Show(db.Model):
+    __tablename__='shows'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    date = db.Column(db.DateTime)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
+    
+    venue = db.relationship('Venue', backref='shows')
+    artist = db.relationship('Artist', backref='shows')
+
+    def __repr__(self):
+        return f'<Show {self.id}: {self.name}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
