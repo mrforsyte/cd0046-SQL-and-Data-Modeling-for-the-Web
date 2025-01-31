@@ -29,23 +29,10 @@ migrate = Migrate(app,db)
 # Models.
 #----------------------------------------------------------------------------#
 
-class Availability(db.Model):
-    
-    __tablename__ = 'availability'
-    
-    id = db.Column(db.Integer,primary_key=True)
-    working_period_start = db.Column(db.DateTime)
-    working_period_end = db.Column(db.DateTime)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
-    artist = db.relationship('Artist', backref='avialabilities')
-    
-    def __repr__(self):
-        return f'<Availability {self.id}: {self.working_period_start} -> {self.working_periond_end}>'
-
 
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
+    __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -59,7 +46,7 @@ class Venue(db.Model):
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
+    __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -88,6 +75,21 @@ class Show(db.Model):
 
     def __repr__(self):
         return f'<Show {self.id}: {self.name}>'
+
+
+class Availability(db.Model):
+    
+    __tablename__ = 'availability'
+    
+    id = db.Column(db.Integer,primary_key=True)
+    working_period_start = db.Column(db.DateTime)
+    working_period_end = db.Column(db.DateTime)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
+    artist = db.relationship('Artist', backref='avialabilities')
+    
+    def __repr__(self):
+        return f'<Availability {self.id}: {self.working_period_start} -> {self.working_period_end}>'
+
 
 #----------------------------------------------------------------------------#
 # Filters.
