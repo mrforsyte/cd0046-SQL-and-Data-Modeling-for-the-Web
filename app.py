@@ -76,7 +76,7 @@ class Show(db.Model):
     def __repr__(self):
         return f'<Show {self.id}: {self.name}>'
 
-
+'''
 class Availability(db.Model):
     
     __tablename__ = 'availability'
@@ -89,7 +89,7 @@ class Availability(db.Model):
     
     def __repr__(self):
         return f'<Availability {self.id}: {self.working_period_start} -> {self.working_period_end}>'
-
+'''
 
 #----------------------------------------------------------------------------#
 # Filters.
