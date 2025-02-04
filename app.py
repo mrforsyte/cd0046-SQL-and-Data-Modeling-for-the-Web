@@ -43,10 +43,13 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
+
+    def __repr__(self):
+       return f'<Vanue {self.id} {self.name}>'
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
-    __tablename__ = 'artist'
+    __tablename__ = 'artists'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -56,6 +59,10 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+  
+    def __repr__(self):
+       return f'< Artist is {self.name} {self.id}>'
+   
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -67,7 +74,7 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     date = db.Column(db.DateTime)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'))
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
     
     venue = db.relationship('Venue', backref='shows')
@@ -76,7 +83,7 @@ class Show(db.Model):
     def __repr__(self):
         return f'<Show {self.id}: {self.name}>'
 
-'''
+
 class Availability(db.Model):
     
     __tablename__ = 'availability'
@@ -89,7 +96,7 @@ class Availability(db.Model):
     
     def __repr__(self):
         return f'<Availability {self.id}: {self.working_period_start} -> {self.working_period_end}>'
-'''
+
 
 #----------------------------------------------------------------------------#
 # Filters.
