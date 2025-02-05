@@ -1,10 +1,12 @@
 {% extends 'layouts/main.html' %}
 {% block title %}Fyyur | Venues Search{% endblock %}
 {% block content %}
+form.hidden_tag()
 <h3>Number of search results for "{{ search_term }}": {{ results.count }}</h3>
+form.hidden_tag()
 <ul class="items">
-	{{ form.csrf_token }}
 	{% for venue in results.data %}
+	
 	<li>
 		<a href="/venues/{{ venue.id }}">
 			<i class="fas fa-music"></i>
