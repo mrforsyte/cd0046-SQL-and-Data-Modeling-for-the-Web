@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 import os
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
@@ -26,8 +26,7 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app,db)
-#csrf = CSRFProtect(app)
-# TODO: connect to a local postgresql database
+
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -56,7 +55,6 @@ class Venue(db.Model):
 
     def __repr__(self):
        return f'<Vanue {self.id} {self.name}>'
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
     __tablename__ = 'artists'
@@ -72,11 +70,6 @@ class Artist(db.Model):
   
     def __repr__(self):
        return f'< Artist is {self.name} {self.id}>'
-   
-
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 class Show(db.Model):
     __tablename__='shows'
@@ -136,8 +129,15 @@ def index():
 
 @app.route('/venues')
 def venues():
-  data = Venue.query.all()
-  return render_template('pages/venues.html', areas=data);
+    try:
+        # pagination may be implemented later
+        data = Venue.query.order_by(Venue.name).all()
+        return render_template('pages/venues.html', areas=data)
+        
+    except Exception as e:
+
+        print(f"Error retrieving venues: {e}")
+        return render_template('errors/500.html'), 500
 
 
 @app.route('/venues/search', methods=['GET','POST'])
@@ -156,11 +156,19 @@ def search_venues():
     print(response)
     
     return render_template('pages/search_venues.html', results=response, search_term=search_term)
+
+
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-
-  data = Venue.query.get(venue_id)
-  return render_template('pages/show_venue.html', venue=data)
+   try:
+      
+      data = Venue.query.get(venue_id)
+      return render_template('pages/show_venue.html', venue=data)
+   except Exception as e:
+       
+        print(f"Error retrieving venue with {venue_id} id: {e}")
+        return render_template('errors/500.html'), 500
+      
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -203,54 +211,87 @@ def create_venue_submission():
     return render_template('pages/home.html')
 
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>', methods=['POST','DELETE'])
 def delete_venue(venue_id):
+    try:
 
-  item_to_delete = db.session.query(Venue).filter(Venue.id == venue_id).get()
-  db.session.delete(item_to_delete)
-  db.session.commit()
-  
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return url_for('home')
+        item_to_delete = db.session.query(Venue).get(venue_id)
+        
+        if not item_to_delete:
+           abort(404)
+            
+        db.session.delete(item_to_delete)
+        db.session.commit()
+        flash('Venue successfully deleted!')
+        
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        flash(f'Error deleting venue: {str(e)}', 'error')
+        abort(500)
+    
+    return redirect(url_for('shows'))
 
 #  Artists
 #  ----------------------------------------------------------------
+
 @app.route('/artists')
 def artists():
-  data = Artist.query.all()
-  return render_template('pages/artists.html', artists=data)
+  try:
+     
+    data = Artist.query.all()
+    return render_template('pages/artists.html', artists=data)
+  
+  except Exception as e:
+    
+    print(f"Error retrieving artists: {e}")
+    return render_template('errors/500.html'), 500
+     
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-  search_term = request.form['search_term']
-  artists = Artist.query.filter(Artist.namename.ilike(f'%{search_term}%')).all()  
-  return render_template('pages/search_artists.html', results=artists, search_term=request.form.get('search_term', ''))
+  try:
+    
+    search_term = request.form['search_term']
+    artists = Artist.query.filter(Artist.namename.ilike(f'%{search_term}%')).all()  
+    return render_template('pages/search_artists.html', results=artists, search_term=request.form.get('search_term', ''))
+  
+  except Exception as e:
+    
+    print(f'Error occured while searchig for specific artist : {e}')
+    return render_template('500.html'), 500
+     
 
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
-  # shows the artist page with the given artist_id
-  # TODO: replace with real artist data from the artist table, using artist_id
-    data = Show.query.get(artist_id)
+    try:
+       
+       data = Show.query.get(artist_id)
+       return render_template('pages/show_artist.html', artist=data)
     
-    return render_template('pages/show_artist.html', artist=data)
+    except Exception as e:
+       
+       print('Error occured while retrieving artists:{e}')
+       return render_template('500.html'),500
 
 #  Update
 #  ----------------------------------------------------------------
+
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
+  try:
+     
+     record = Artist.query.get_or_404(artist_id)
+     form = ArtistForm(obj=record)
+     return render_template('forms/edit_artist.html', form=form, artist=record)
   
-  record = Artist.query.get_or_404(artist_id)
-  form = ArtistForm(obj=record)
-  
-  # TODO: populate form with fields from artist with ID <artist_id>
-  return render_template('forms/edit_artist.html', form=form, artist=record)
+  except Exception as e:
+     
+     print('Error occured when retrieving artists with error" {e}')
+     return render_template('500.html'),500
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+  
   record = Artist.query.get_or_404(artist_id)
   form = ArtistForm(obj=record)
   if form.validate():
@@ -299,9 +340,6 @@ def edit_venue_submission(venue_id):
           flash(f'Error in {field}: {error}')
   
   return redirect(url_for('show_venue', venue_id=venue_id))
-
-#  Create Artist
-#  ----------------------------------------------------------------
 
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
