@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 import os
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
@@ -76,7 +76,7 @@ class Show(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
-    start_time = db.Column(db.DateTime)
+    start_time = db.Column(db.DateTime,index=True)
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'))
     
@@ -144,13 +144,17 @@ def venues():
 def search_venues():
     search_term = request.form.get('search_term', '')
     venues = Venue.query.filter(func.lower(Venue.name).contains(func.lower(search_term))).all()
+    current_time = datetime.now()
     
     response = {
         "count": len(venues),
         "data": [{
             "id": venue.id,
             "name": venue.name,
-            "num_upcoming_shows": 0  # You may need to calculate this based on your data model
+            "num_upcoming_shows": len([
+                show for show in venue.shows 
+                if show.start_time > current_time
+            ])
         } for venue in venues]
     }
     print(response)
@@ -327,10 +331,10 @@ def edit_venue_submission(venue_id):
     try:
       form.populate_obj(venue)
       db.session.commit()
-      flash(f'Venue {venue.name} was successfully updated!')
+      flash(f'Venue {venue.id}:{venue.name} was successfully updated!')
     except Exception as e:
       db.session.rollback()
-      flash(f'An error occurred. Venue {venue.name} could not be updated.')
+      flash(f'The error occurred. Venue {venue.name} could not be updated.')
       print(e)  
     finally:
        db.session.close()
@@ -365,8 +369,8 @@ def create_artist_submission():
             flash('Artist ' + new_artist.name + ' was successfully listed!')
         except Exception as e:
             db.session.rollback()
-            flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
-            print(e)  # For debugging purposes
+            flash('The error occurred. Artist ' + form.name.data + ' could not be listed.')
+            print(f'Error is {e}')
         finally:
             db.session.close()
     else:
