@@ -3,9 +3,6 @@
 # ----------------------------------------------------------------------------#
 from werkzeug.serving import run_simple
 from sqlalchemy.sql import func
-import os
-import dateutil.parser
-import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -33,13 +30,7 @@ def create_app():
 # Filters.
 # ----------------------------------------------------------------------------#
 
-def format_datetime(value, format='medium'):
-    date = dateutil.parser.parse(value)
-    if format == 'full':
-        format = "EEEE MMMM, d, y 'at' h:mma"
-    elif format == 'medium':
-        format = "EE MM, dd, y h:mma"
-    return babel.dates.format_datetime(date, format, locale='en')
+
 
 
 app.jinja_env.filters['datetime'] = format_datetime
