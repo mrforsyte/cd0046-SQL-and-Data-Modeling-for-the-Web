@@ -429,13 +429,8 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
-# ----------------------------------------------------------------------------#
-# Launch.
-# ----------------------------------------------------------------------------#
 
 
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 63653))
-    app = create_app()
-    app.run(host='0.0.0.0', port=port)
+
+
