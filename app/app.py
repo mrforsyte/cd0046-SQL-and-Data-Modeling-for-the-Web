@@ -17,22 +17,16 @@ from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 from forms import *
 from datetime import datetime
-from models import db, Venue, Artist, Show, Availability
+from models import Venue, Artist, Show, Availability
+from extensions import db, migrate
 # ----------------------------------------------------------------------------#
 # App Config.
 # ----------------------------------------------------------------------------#
-
-app = Flask(__name__)
-
-moment = Moment(app)
-
-app.config.from_object('config')
-
-#db = SQLAlchemy(app)
-
-migrate = Migrate(app, db)
-
-
+def create_app():
+    app = Flask(__name__)
+    moment = Moment(app)
+    app.config.from_object('config')
+    migrate = Migrate(app, db)
 
 
 # ----------------------------------------------------------------------------#
@@ -439,16 +433,9 @@ if not app.debug:
 # Launch.
 # ----------------------------------------------------------------------------#
 
-# Default port:
-'''
-if __name__ == '__main__':
-   run_simple('localhost', 0, app, use_reloader=True)
 
-
-    #app.run(debug=True, port=5000)
-'''
-# Or specify port manually:
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 63653))
+    app = create_app()
     app.run(host='0.0.0.0', port=port)
