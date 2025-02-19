@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from models import Show, Artist,Venue
-from forms import ShowForm
+from ...models import Show, Artist,Venue
+from ...forms import ShowForm
 from extensions import db
 
 
