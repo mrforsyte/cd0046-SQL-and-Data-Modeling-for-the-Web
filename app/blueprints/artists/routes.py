@@ -1,8 +1,8 @@
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from ...models import Artist
+from ...models import Artist, Show
 from ...forms import ArtistForm
-from extensions import db
+from ...extensions import db
 
 artist_bp = Blueprint('artists', __name__)
 

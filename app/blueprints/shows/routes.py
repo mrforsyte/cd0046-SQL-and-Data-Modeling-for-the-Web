@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from ...models import Show, Artist,Venue
 from ...forms import ShowForm
-from extensions import db
+from ...extensions import db
 
 
 show_bp = Blueprint('shows', __name__)

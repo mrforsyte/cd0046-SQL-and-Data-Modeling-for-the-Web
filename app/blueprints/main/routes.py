@@ -1,7 +1,18 @@
-from flask import render_template, request, redirect, url_for
-from . import main_bp
+from flask import Blueprint, current_app, render_template
+from jinja2 import TemplateNotFound
+
+
+main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    return render_template('templates/layout/home.html')
+    current_app.logger.info("Entering index route")
+    try:
+        current_app.logger.info("Attempting to render template")
+        return render_template('pages/home.html')
 
+    except TemplateNotFound:
+        current_app.logger.error("Template 'pages/home.html' not found")
+        return render_template('errors/404.html'), 404
+
+    

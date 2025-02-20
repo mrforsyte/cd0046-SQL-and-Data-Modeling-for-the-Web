@@ -1,6 +1,6 @@
-from flask import Blueprints
+from flask import Blueprint
 
-artists_bp = Blueprints('artists', __name__)
+artists_bp = Blueprint('artists', __name__)
 
 from . import routes 
 
