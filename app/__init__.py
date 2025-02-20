@@ -3,18 +3,31 @@ import logging
 from logging import Formatter, FileHandler
 from .extensions import db, migrate, moment
 from .utils import format_datetime
+from jinja2 import Environment, FileSystemLoader
 
 def create_app():
+
     app = Flask(__name__)
     app.config.from_object('config')
 
-    # Initialize extensions
+   # Define a custom filter
+    def startswith(string, prefix):
+        return string.startswith(prefix)
+
+    # Create a Jinja2 environment
+    env = Environment(loader=FileSystemLoader('templates'))
+    env.filters['startswith'] = startswith
+
+    # Now you can use the startswith filter in your templates
+
+
     db.init_app(app)
     migrate.init_app(app, db)
     moment.init_app(app)
 
     # Register Jinja2 filter
     app.jinja_env.filters['datetime'] = format_datetime
+    app.jinja_env.filters['startswith'] = startswith
 
     # Register blueprints
     from .blueprints.main import main_bp

@@ -79,10 +79,16 @@
             </li>
           </ul>
           <ul class="nav navbar-nav">
-            <li {% if request.endpoint == 'venues' %} class="active" {% endif %}><a href="{{ url_for('venues') }}">Venues</a></li>
-            <li {% if request.endpoint == 'artists' %} class="active" {% endif %}><a href="{{ url_for('artists') }}">Artists</a></li>
-            <li {% if request.endpoint == 'shows' %} class="active" {% endif %}><a href="{{ url_for('shows') }}">Shows</a></li>
-          </ul>
+            <li {% if request.endpoint|default('')|startswith('venues.') %} class="active" {% endif %}>
+                <a href="{{ url_for('venues.venues') }}">Venues</a>
+            </li>
+            <li {% if request.endpoint|default('')|startswith('artists.') %} class="active" {% endif %}>
+                <a href="{{ url_for('artists.artists') }}">Artists</a>
+            </li>
+            <li {% if request.endpoint|default('')|startswith('shows.') %} class="active" {% endif %}>
+                <a href="{{ url_for('shows.shows') }}">Shows</a>
+            </li>
+        </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>
