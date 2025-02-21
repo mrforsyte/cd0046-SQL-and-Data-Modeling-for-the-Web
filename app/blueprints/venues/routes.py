@@ -6,11 +6,11 @@ from sqlalchemy.sql import func
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from . import venues_bp
 
 
-venue_bp = Blueprint('venues', __name__)
 
-@venue_bp.route('/venues')
+@venues_bp.route('/venues')
 def venues():
     try:
         data = Venue.query.order_by(Venue.name).all()
@@ -22,7 +22,7 @@ def venues():
         return render_template('errors/500.html'), 500
 
 
-@venue_bp.route('/venues/search', methods=['GET', 'POST'])
+@venues_bp.route('/venues/search', methods=['GET', 'POST'])
 def search_venues():
     search_term = request.form.get('search_term', '')
     venues = Venue.query.filter(
@@ -50,7 +50,7 @@ def search_venues():
         search_term=search_term)
 
 
-@venue_bp.route('/venues/<int:venue_id>')
+@venues_bp.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
     try:
 
@@ -65,13 +65,13 @@ def show_venue(venue_id):
 #  Create Venue
 #  ----------------------------------------------------------------
 
-@venue_bp.route('/venues/create', methods=['GET'])
+@venues_bp.route('/venues/create', methods=['GET'])
 def create_venue_form():
     form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
 
-@venue_bp.route('/venues/create', methods=['POST'])
+@venues_bp.route('/venues/create', methods=['POST'])
 def create_venue_submission():
     venue_form = VenueForm()
     if venue_form.validate():
@@ -110,7 +110,7 @@ def create_venue_submission():
     return render_template('pages/home.html')
 
 
-@venue_bp.route('/venues/<venue_id>', methods=['POST', 'DELETE'])
+@venues_bp.route('/venues/<venue_id>', methods=['POST', 'DELETE'])
 def delete_venue(venue_id):
     try:
 
@@ -133,7 +133,7 @@ def delete_venue(venue_id):
 #  Artists
 #  ----------------------------------------------------------------
 
-@venue_bp.route('/venues/<int:venue_id>/edit', methods=['GET'])
+@venues_bp.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
     record = Venue.query.get_or_404(venue_id)
     form = VenueForm(obj=record)
@@ -141,7 +141,7 @@ def edit_venue(venue_id):
     return render_template('forms/edit_venue.html', form=form, venue=record)
 
 
-@venue_bp.route('/venues/<int:venue_id>/edit', methods=['POST'])
+@venues_bp.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
     venue = Venue.query.get_or_404(venue_id)
     form = VenueForm(request.form)

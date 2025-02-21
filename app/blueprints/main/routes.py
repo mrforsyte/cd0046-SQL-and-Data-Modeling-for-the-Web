@@ -1,8 +1,9 @@
 from flask import Blueprint, current_app, render_template
 from jinja2 import TemplateNotFound
+from . import main_bp
 
 
-main_bp = Blueprint('main', __name__)
+
 
 @main_bp.route('/')
 def index():

@@ -1,12 +1,15 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, current_app
 from ...models import Show, Artist,Venue
 from ...forms import ShowForm
 from ...extensions import db
+from . import shows_bp
+from sqlalchemy import SQLAlchemyError
 
 
-show_bp = Blueprint('shows', __name__)
 
-@show_bp.route('/shows')
+
+
+@shows_bp.route('/shows')
 def shows():
     shows = db.session.query(Show, Venue, Artist).join(
         Venue).join(Artist).all()
@@ -23,7 +26,7 @@ def shows():
     return render_template('pages/shows.html', shows=data)
 
 
-@show_bp.route('/shows/create')
+@shows_bp.route('/shows/create')
 def create_shows():
     # renders form. do not touch.
     form = ShowForm()
@@ -31,7 +34,7 @@ def create_shows():
     return render_template('forms/new_show.html', form=form)
 
 
-@show_bp.route('/shows/create', methods=['POST'])
+@shows_bp.route('/shows/create', methods=['POST'])
 def create_show_submission():
     form = ShowForm()
     if form.validate_on_submit():
@@ -54,11 +57,11 @@ def create_show_submission():
             return redirect(url_for('shows'))
         except SQLAlchemyError as e:
             db.session.rollback()
-            logging.error(f"Database error creating show: {str(e)}")
+            current_app.logger.error(f"Database error creating show: {str(e)}")
             flash('An error occurred. Show could not be listed due to a database issue.')
         except Exception as e:
             db.session.rollback()
-            logging.error(f"Unexpected error creating show: {str(e)}")
+            current_app.logger.error(f"Unexpected error creating show: {str(e)}")
             flash('An unexpected error occurred. Show could not be listed.')
         finally:
             db.session.close()

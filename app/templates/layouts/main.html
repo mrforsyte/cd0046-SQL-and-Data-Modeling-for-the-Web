@@ -79,13 +79,13 @@
             </li>
           </ul>
           <ul class="nav navbar-nav">
-            <li {% if request.endpoint|default('')|startswith('venues.') %} class="active" {% endif %}>
+            <li {% if request.blueprint == 'venues' %} class="active" {% endif %}>
                 <a href="{{ url_for('venues.venues') }}">Venues</a>
             </li>
-            <li {% if request.endpoint|default('')|startswith('artists.') %} class="active" {% endif %}>
+            <li {% if request.blueprint == 'artists' %} class="active" {% endif %}>
                 <a href="{{ url_for('artists.artists') }}">Artists</a>
             </li>
-            <li {% if request.endpoint|default('')|startswith('shows.') %} class="active" {% endif %}>
+            <li {% if request.blueprint == 'shows' %} class="active" {% endif %}>
                 <a href="{{ url_for('shows.shows') }}">Shows</a>
             </li>
         </ul>

@@ -12,6 +12,8 @@ def create_app():
 
    # Define a custom filter
     def startswith(string, prefix):
+        if string is None:
+            return False
         return string.startswith(prefix)
 
     # Create a Jinja2 environment
@@ -19,7 +21,6 @@ def create_app():
     env.filters['startswith'] = startswith
 
     # Now you can use the startswith filter in your templates
-
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -35,10 +36,10 @@ def create_app():
     from .blueprints.artists import artists_bp
     from .blueprints.shows import shows_bp
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(venues_bp)
-    app.register_blueprint(artists_bp)
-    app.register_blueprint(shows_bp)
+    app.register_blueprint(main_bp, url_prefix='/home')
+    app.register_blueprint(venues_bp,url_prefix='/venues')
+    app.register_blueprint(artists_bp,url_prefix='/artists')
+    app.register_blueprint(shows_bp, url_prefix='/shows')
 
     # Error handlers
     @app.errorhandler(404)
