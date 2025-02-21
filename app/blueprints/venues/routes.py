@@ -13,7 +13,8 @@ from . import venues_bp
 @venues_bp.route('/venues')
 def venues():
     try:
-        data = Venue.query.order_by(Venue.name).all()
+        data = Venue.query.all()
+        print(data)
         return render_template('pages/venues.html', areas=data)
 
     except Exception as e:
@@ -128,7 +129,7 @@ def delete_venue(venue_id):
         flash(f'Error deleting venue: {str(e)}', 'error')
         abort(500)
 
-    return redirect(url_for('shows'))
+    return redirect(url_for('venues.venues'))
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -163,4 +164,4 @@ def edit_venue_submission(venue_id):
             for error in errors:
                 flash(f'Error in {field}: {error}')
 
-    return redirect(url_for('show_venue', venue_id=venue_id))
+    return redirect(url_for('venues.show_venue', venue_id=venue_id))

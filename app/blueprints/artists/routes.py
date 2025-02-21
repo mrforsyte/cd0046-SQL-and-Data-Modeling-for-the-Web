@@ -62,7 +62,7 @@ def search_artists():
 
         search_term = request.form['search_term']
         artists = Artist.query.filter(
-            Artist.namename.ilike(f'%{search_term}%')).all()
+            Artist.name.ilike(f'%{search_term}%')).all()
         return render_template(
             'pages/search_artists.html',
             results=artists,
@@ -80,7 +80,7 @@ def search_artists():
 def show_artist(artist_id):
     try:
 
-        data = Show.query.get(artist_id)
+        data = Artist.query.get(artist_id)
         return render_template('pages/show_artist.html', artist=data)
 
     except Exception as e:

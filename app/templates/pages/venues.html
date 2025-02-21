@@ -3,7 +3,7 @@
 {% block content %}
 {% for area in areas %}
 <h3>{{ area.city }}, {{ area.name }}</h3>
-<form method="POST" action="{{ url_for('delete_venue', venue_id=area.id) }}">
+<form method="POST" action="{{ url_for('venues.delete_venue', venue_id=area.id) }}">
     <input type="hidden" name="_method" value="DELETE">
     <button type="submit" class="btn btn-danger" 
             onclick="return confirm('Permanently delete this venue?');">

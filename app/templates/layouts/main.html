@@ -48,15 +48,15 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">🔥</a>
+          <a class="navbar-brand" href="{{ url_for('main.index') }}">🔥</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li>
-              {% if (request.endpoint == 'venues') or
-                (request.endpoint == 'search_venues') or
-                (request.endpoint == 'show_venue') %}
-              <form class="search" method="post" action="/venues/search">
+              {% if (request.blueprint == 'venues') or
+                (request.blueprint == 'search_venues') or
+                (request.blueprint == 'show_venue') %}
+              <form class="search" method="post" action="{{ url_for ('venues.search_venues') }}">
                
                 <input class="form-control"
                   type="search"
@@ -65,9 +65,9 @@
                   aria-label="Search">
               </form>
               {% endif %}
-              {% if (request.endpoint == 'artists') or
-                (request.endpoint == 'search_artists') or
-                (request.endpoint == 'show_artist') %}
+              {% if (request.blueprint == 'artists') or
+                (request.blueprint == 'search_artists') or
+                (request.blueprint == 'show_artist') %}
               <form class="search" method="post" action="/artists/search">
                 <input class="form-control"
                   type="search"
