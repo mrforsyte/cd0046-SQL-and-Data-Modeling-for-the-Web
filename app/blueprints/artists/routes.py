@@ -3,16 +3,16 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from ...models import Artist, Show
 from ...forms import ArtistForm
 from ...extensions import db
+from . import artists_bp
 
-artist_bp = Blueprint('artists', __name__)
 
-@artist_bp.route('/artists/create', methods=['GET'])
+@artists_bp.route('/artists/create', methods=['GET'])
 def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
 
 
-@artist_bp.route('/artists/create', methods=['POST'])
+@artists_bp.route('/artists/create', methods=['POST'])
 def create_artist_submission():
     form = ArtistForm()
     if form.validate_on_submit():
@@ -46,7 +46,7 @@ def create_artist_submission():
     return render_template('pages/home.html')
 
 
-@artist_bp.route('/artists')
+@artists_bp.route('/artists')
 def artists():
     try:
         data = Artist.query.all()
@@ -56,7 +56,7 @@ def artists():
         return render_template('errors/500.html'), 500
 
 
-@artist_bp.route('/artists/search', methods=['POST'])
+@artists_bp.route('/artists/search', methods=['POST'])
 def search_artists():
     try:
 
@@ -76,7 +76,7 @@ def search_artists():
         return render_template('500.html'), 500
 
 
-@artist_bp.route('/artists/<int:artist_id>')
+@artists_bp.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
     try:
 
@@ -89,7 +89,7 @@ def show_artist(artist_id):
         return render_template('500.html'), 500
 
 
-@artist_bp.route('/artists/<int:artist_id>/edit', methods=['GET'])
+@artists_bp.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     try:
 
@@ -106,7 +106,7 @@ def edit_artist(artist_id):
         return render_template('500.html'), 500
 
 
-@artist_bp.route('/artists/<int:artist_id>/edit', methods=['POST'])
+@artists_bp.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
 
     record = Artist.query.get_or_404(artist_id)

@@ -3,10 +3,7 @@ from ...models import Show, Artist,Venue
 from ...forms import ShowForm
 from ...extensions import db
 from . import shows_bp
-from sqlalchemy import SQLAlchemyError
-
-
-
+from sqlalchemy.exc import SQLAlchemyError
 
 
 @shows_bp.route('/shows')
