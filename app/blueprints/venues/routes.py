@@ -51,7 +51,7 @@ def search_venues():
         search_term=search_term)
 
 
-@venues_bp.route('/venues/<int:venue_id>')
+@venues_bp.route('/<int:venue_id>')
 def show_venue(venue_id):
     try:
 

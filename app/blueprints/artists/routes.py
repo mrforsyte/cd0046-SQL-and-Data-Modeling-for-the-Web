@@ -5,12 +5,10 @@ from ...forms import ArtistForm
 from ...extensions import db
 from . import artists_bp
 
-
 @artists_bp.route('/artists/create', methods=['GET'])
 def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
-
 
 @artists_bp.route('/artists/create', methods=['POST'])
 def create_artist_submission():
@@ -76,23 +74,24 @@ def search_artists():
         return render_template('500.html'), 500
 
 
-@artists_bp.route('/artists/<int:artist_id>')
+@artists_bp.route('/<int:artist_id>')
 def show_artist(artist_id):
     try:
 
-        data = Artist.query.get(artist_id)
-        return render_template('pages/show_artist.html', artist=data)
+        artist = Artist.query.get_or_404(artist_id)
+        artist.upcoming_shows = artist.get_upcoming_shows()
+        artist.past_shows = artist.get_past_shows()
+        return render_template('pages/show_artist.html', artist=artist)
 
     except Exception as e:
 
-        print('Error occured while retrieving artists:{e}')
+        print('Error occured while retrieving artists:{str(e)}')
         return render_template('500.html'), 500
 
 
 @artists_bp.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     try:
-
         record = Artist.query.get_or_404(artist_id)
         form = ArtistForm(obj=record)
         return render_template(
@@ -102,7 +101,7 @@ def edit_artist(artist_id):
 
     except Exception as e:
 
-        print('Error occured when retrieving artists with error" {e}')
+        print(f'Error occured when retrieving artists with error {e}')
         return render_template('500.html'), 500
 
 
