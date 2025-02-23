@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, AnyOf, URL
 
 class ShowForm(FlaskForm):
@@ -237,3 +237,9 @@ class ArtistForm(FlaskForm):
             'seeking_description'
      )
 
+class AvailabilityForm(FlaskForm):
+    working_period_start = DateTimeField('Start Time', validators=[DataRequired])
+    working_period_end = DateTimeField('End Time', validators=[DataRequired])
+    Submit = SubmitField("Add Availability")
+
+    
