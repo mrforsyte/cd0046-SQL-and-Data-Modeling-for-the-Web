@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from ...models import Venue
 from ...forms import VenueForm
 from ...extensions import db
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, desc
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
@@ -13,7 +13,7 @@ from . import venues_bp
 @venues_bp.route('/venues')
 def venues():
     try:
-        data = Venue.query.all()
+        data = Venue.query.order_by(desc(Venue.created_at)).limit(10).all()
         print(data)
         return render_template('pages/venues.html', areas=data)
 

@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from ...models import Artist, Show
 from ...forms import ArtistForm
 from ...extensions import db
+from sqlalchemy.sql import desc 
 from . import artists_bp
 
 @artists_bp.route('/artists/create', methods=['GET'])
@@ -47,7 +48,7 @@ def create_artist_submission():
 @artists_bp.route('/artists')
 def artists():
     try:
-        data = Artist.query.all()
+        data = Artist.query.order_by(desc(Artist.id)).limit(10).all()
         return render_template('pages/artists.html', artists=data)
     except Exception as e:
         print(f"Error retrieving artists: {e}")
