@@ -89,7 +89,7 @@ def show_artist(artist_id):
         return render_template('500.html'), 500
 
 
-@artists_bp.route('/artists/<int:artist_id>/edit', methods=['GET'])
+@artists_bp.route('/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
     try:
         record = Artist.query.get_or_404(artist_id)

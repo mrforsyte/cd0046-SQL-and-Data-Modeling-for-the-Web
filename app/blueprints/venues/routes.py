@@ -72,10 +72,10 @@ def create_venue_form():
     return render_template('forms/new_venue.html', form=form)
 
 
-@venues_bp.route('/venues/create', methods=['POST'])
+@venues_bp.route('/create', methods=['POST'])
 def create_venue_submission():
     venue_form = VenueForm()
-    if venue_form.validate():
+    if venue_form.validate_on_submit():
         try:
             new_venue = Venue(
                 name=venue_form.name.data,
@@ -90,10 +90,8 @@ def create_venue_submission():
             )
             db.session.add(new_venue)
             db.session.commit()
-            flash(
-                'Venue ' +
-                request.form['name'] +
-                ' was successfully listed!')
+            flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
         except Exception as e:
             db.session.rollback()
             flash(
@@ -134,7 +132,7 @@ def delete_venue(venue_id):
 #  Artists
 #  ----------------------------------------------------------------
 
-@venues_bp.route('/venues/<int:venue_id>/edit', methods=['GET'])
+@venues_bp.route('/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
     record = Venue.query.get_or_404(venue_id)
     form = VenueForm(obj=record)
@@ -142,7 +140,7 @@ def edit_venue(venue_id):
     return render_template('forms/edit_venue.html', form=form, venue=record)
 
 
-@venues_bp.route('/venues/<int:venue_id>/edit', methods=['POST'])
+@venues_bp.route('/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
     venue = Venue.query.get_or_404(venue_id)
     form = VenueForm(request.form)
