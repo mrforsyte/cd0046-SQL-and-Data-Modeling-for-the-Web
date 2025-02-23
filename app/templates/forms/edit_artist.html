@@ -20,6 +20,19 @@
             </div>
           </div>
       </div>
+      <h3>Availabilities</h3>
+  {% for availability in form.availabilities %}
+    <div class="availability-entry">
+      <div>
+        {{ availability.working_period_start.label }}
+        {{ availability.working_period_start(class="form-control", type="datetime-local") }}
+      </div>
+      <div>
+        {{ availability.working_period_end.label }}
+        {{ availability.working_period_end(class="form-control", type="datetime-local") }}
+      </div>
+    </div>
+  {% endfor %}
       <div class="form-group">
           <label for="phone">Phone</label>
           {{ form.phone(class_ = 'form-control', placeholder='xxx-xxx-xxxx', autofocus = true) }}
@@ -56,5 +69,6 @@
       
       <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
     </form>
-  </div>
-{% endblock %}
+
+    
+

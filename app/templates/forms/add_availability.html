@@ -1,0 +1,67 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Add Availability | {{ artist.name }}{% endblock %}
+{% block content %}
+  <div class="form-wrapper">
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            <h2>Add Availability for {{ artist.name }}</h2>
+            <p>Please select the start and end times for the artist's availability.</p>
+          {{ form.working_period_start.label }}
+          {{ form.working_period_start(class="form-control", type="datetime-local") }}
+        </div>
+        <div>
+          {{ form.working_period_end.label }}
+          {{ form.working_period_end(class="form-control", type="datetime-local") }}
+        </div>
+        {{ form.submit() }}
+      </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('availabilityForm');
+      const startTime = document.getElementById('working_period_start');
+      const endTime = document.getElementById('working_period_end');
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        removeErrors();
+
+        if (startTime.value === '') {
+          displayError(startTime, 'Start time is required');
+        }
+        if (endTime.value === '') {
+          displayError(endTime, 'End time is required');
+        }
+        if (startTime.value !== '' && endTime.value !== '') {
+          if (new Date(startTime.value) >= new Date(endTime.value)) {
+            displayError(endTime, 'End time must be after start time');
+          } else {
+            form.submit();
+          }
+        }
+      });
+
+      function displayError(field, message) {
+        const errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        errorElement.textContent = message;
+        field.parentNode.insertBefore(errorElement, field.nextSibling);
+      }
+
+      function removeErrors() {
+        const errors = document.querySelectorAll('.error-message');
+        errors.forEach(error => error.remove());
+      }
+    });
+  </script>
+
+  <style>
+    .error-message {
+      color: red;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+  </style>
+{% endblock %}
