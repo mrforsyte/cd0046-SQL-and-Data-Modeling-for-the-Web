@@ -128,14 +128,12 @@ def edit_artist_submission(artist_id):
             
             new_starts = request.form.getlist('new_availability_start')
             new_ends = request.form.getlist('new_availability_end')
-            for start, end in zip(new_starts, new_ends):
-                if start and end:
-                    new_availability = Availability(
-                        artist_id=artist_id,
-                        working_period_start=datetime.strptime(start, '%Y-%m-%dT%H:%M'),
-                        working_period_end=datetime.strptime(end, '%Y-%m-%dT%H:%M')
+            new_availability = Availability(
+                artist_id=artist_id,
+                working_period_start=datetime.strptime(start, '%Y-%m-%dT%H:%M'),
+                working_period_end=datetime.strptime(end, '%Y-%m-%dT%H:%M')
                     )
-                    db.session.add(new_availability)
+            db.session.add(new_availability)
             
             db.session.commit()
             flash(f'Artist {record.name} was updated successfully')
