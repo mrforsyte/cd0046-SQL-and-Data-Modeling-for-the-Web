@@ -2,7 +2,7 @@
 {% block title %}New Show Listing{% endblock %}
 {% block content %}
   <div class="form-wrapper">
-    <form method="post" class="form">
+    <form method="post" class="form" action="{{ url_for('shows.create_show_submission') }}">
       {{ form.csrf_token }}
       <h3 class="form-heading">List a new show</h3>
       <div class="form-group">
@@ -18,8 +18,7 @@
       <div class="form-group">
           <label for="start_time">Start Time</label>
           {{ form.start_time(class_ = 'form-control', placeholder='YYYY-MM-DD HH:MM', autofocus = true) }}
-        </div>
-        <form method="post" class="form" action="{{ url_for('shows.create_shows') }}"></form>
+      </div>
       <input type="submit" value="Create Show" class="btn btn-primary btn-lg btn-block">
     </form>
   </div>

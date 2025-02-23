@@ -5,8 +5,7 @@ from ...extensions import db
 from . import shows_bp
 from sqlalchemy.exc import SQLAlchemyError
 
-
-@shows_bp.route('/shows')
+@shows_bp.route('/')
 def shows():
     shows = db.session.query(Show, Venue, Artist).join(
         Venue).join(Artist).all()
@@ -23,7 +22,7 @@ def shows():
     return render_template('pages/shows.html', shows=data)
 
 
-@shows_bp.route('/shows/create')
+@shows_bp.route('/create')
 def create_shows():
     # renders form. do not touch.
     form = ShowForm()
@@ -31,7 +30,7 @@ def create_shows():
     return render_template('forms/new_show.html', form=form)
 
 
-@shows_bp.route('/shows/create', methods=['POST'])
+@shows_bp.route('/create', methods=['POST'])
 def create_show_submission():
     form = ShowForm()
     if form.validate_on_submit():
@@ -51,15 +50,11 @@ def create_show_submission():
             db.session.commit()
             flash(
                 f'Show was successfully listed for {artist.name} at {venue.name}!')
-            return redirect(url_for('shows'))
+            return redirect(url_for('shows.shows'))
         except SQLAlchemyError as e:
             db.session.rollback()
             current_app.logger.error(f"Database error creating show: {str(e)}")
             flash('An error occurred. Show could not be listed due to a database issue.')
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Unexpected error creating show: {str(e)}")
-            flash('An unexpected error occurred. Show could not be listed.')
         finally:
             db.session.close()
     else:
