@@ -1,0 +1,19 @@
+{% extends 'layouts/main.html' %}
+{% block title %}Edit Artist Availability{% endblock %}
+{% block content %}
+  <div class="form-wrapper">
+    <h3 class="form-heading">Edit availability for <em>{{ artist.name }}</em></h3>
+    <form class="form" method="post" action="{{ url_for('artists.edit_artist_availability', artist_id=artist.id) }}">
+      {{ form.csrf_token }}
+      <div class="form-group">
+        {{ form.working_period_start.label }}
+        {{ form.working_period_start(class_='form-control') }}
+      </div>
+      <div class="form-group">
+        {{ form.working_period_end.label }}
+        {{ form.working_period_end(class_='form-control') }}
+      </div>
+      {{ form.submit(class_='btn btn-primary') }}
+    </form>
+  </div>
+{% endblock %}
