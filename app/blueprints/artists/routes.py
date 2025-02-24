@@ -1,6 +1,6 @@
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from ...models import Artist, Availability
+from ...models import Artist, Availability, Show
 from ...forms import ArtistForm, AvailabilityForm
 from ...extensions import db
 from sqlalchemy.sql import desc 
@@ -60,21 +60,40 @@ def artists():
 @artists_bp.route('/artists/search', methods=['POST'])
 def search_artists():
     try:
+        # Get the search term from the form
+        search_term = request.form.get('search_term', '')
 
-        search_term = request.form['search_term']
+        # Perform a case-insensitive search using ilike
         artists = Artist.query.filter(
-            Artist.name.ilike(f'%{search_term}%')).all()
+            Artist.name.ilike(f'%{search_term}%')
+        ).all()
+
+        # Prepare the response data
+        response = {
+            "count": len(artists),
+            "data": [{
+                "id": artist.id,
+                "name": artist.name,
+                "num_upcoming_shows": Show.query.filter(
+                    Show.artist_id == artist.id,
+                    Show.start_time > datetime.now()
+                ).count()
+            } for artist in artists]
+        }
+
+        # Render the search results page
         return render_template(
             'pages/search_artists.html',
-            results=artists,
-            search_term=request.form.get(
-                'search_term',
-                ''))
+            results=response,
+            search_term=search_term
+        )
 
     except Exception as e:
-
-        print(f'Error occured while searchig for specific artist : {e}')
-        return render_template('500.html'), 500
+        # Log the error for debugging purposes
+        print(f'Error occurred while searching for specific artist: {e}')
+        
+        # Render a 500 error page
+        return render_template('errors/500.html'), 500
 
 
 @artists_bp.route('/<int:artist_id>')

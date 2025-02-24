@@ -56,7 +56,7 @@
               {% if (request.blueprint == 'venues') or
                 (request.blueprint == 'search_venues') or
                 (request.blueprint == 'show_venue') %}
-              <form class="search" method="post" action="{{ url_for ('venues.search_venues') }}">
+              <form class="search" method="post" action='{{ url_for("venues.search_venues")}}'>
                
                 <input class="form-control"
                   type="search"
@@ -68,7 +68,7 @@
               {% if (request.blueprint == 'artists') or
                 (request.blueprint == 'search_artists') or
                 (request.blueprint == 'show_artist') %}
-              <form class="search" method="post" action='{{ url_for("artists.search_artists") }}'>
+              <form class="search" method="post" action='{{ url_for("artists.search_artists")}}'>
                 <input class="form-control"
                   type="search"
                   name="search_term"

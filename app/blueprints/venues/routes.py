@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
-from ...models import Venue
+from flask import render_template, request, flash, redirect, url_for, abort, current_app
+from ...models import Venue,Show
 from ...forms import VenueForm
 from ...extensions import db
 from sqlalchemy.sql import func, desc
@@ -18,48 +18,64 @@ def venues():
 
         areas = []
         for city, state in locations:
-            venues = Venue.query.filter_by(city=city, state=state).all()
-            print(f"City: {city}, State: {state}, Venues: {venues}")  # Debugging output
+            # Filter venues by city and state
+            venues = Venue.query.filter(Venue.city == city, Venue.state == state).all()
             if venues:  # Only add areas with venues
+                venue_data = []
+                for venue in venues:
+                    # Calculate past and upcoming shows
+                    past_shows = venue.get_past_shows()
+                    upcoming_shows = venue.get_upcoming_shows()
+
+                    venue_data.append({
+                        "id": venue.id,
+                        "name": venue.name,
+                        "num_upcoming_shows": len(upcoming_shows),
+                        "num_past_shows": len(past_shows)
+                    })
+
                 areas.append({
                     "city": city,
                     "state": state,
-                    "venues": venues
+                    "venues": venue_data
                 })
 
         return render_template('pages/venues.html', areas=areas)
 
     except Exception as e:
+        # Log the error (optional: use Flask's logger)
         print(f"Error retrieving venues: {e}")
         return render_template('errors/500.html'), 500
+    
 
 
-@venues_bp.route('/venues/search', methods=['GET', 'POST'])
+
+@venues_bp.route('/search', methods=['POST'])
 def search_venues():
     search_term = request.form.get('search_term', '')
-    venues = Venue.query.filter(
-        func.lower(
-            Venue.name).contains(
-            func.lower(search_term))).all()
     current_time = datetime.now()
+
+    venues = Venue.query.filter(
+        func.lower(Venue.name).contains(func.lower(search_term))
+    ).all()
 
     response = {
         "count": len(venues),
         "data": [{
             "id": venue.id,
             "name": venue.name,
-            "num_upcoming_shows": len([
-                show for show in venue.shows
-                if show.start_time > current_time
-            ])
+            "num_upcoming_shows": Show.query.filter(
+                Show.venue_id == venue.id,
+                Show.start_time > current_time
+            ).count()
         } for venue in venues]
     }
-    print(response)
 
     return render_template(
         'pages/search_venues.html',
         results=response,
-        search_term=search_term)
+        search_term=search_term
+    )
 
 
 @venues_bp.route('/<int:venue_id>')
