@@ -1,8 +1,9 @@
 from flask import render_template, request, flash, redirect, url_for, current_app
-from ...models import Show, Artist,Venue
+from ...models import Show, Artist,Venue, Availability
 from ...forms import ShowForm
 from ...extensions import db
 from . import shows_bp
+from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
 
 @shows_bp.route('/')
@@ -30,6 +31,8 @@ def create_shows():
     return render_template('forms/new_show.html', form=form)
 
 
+from flask import jsonify
+
 @shows_bp.route('/create', methods=['POST'])
 def create_show_submission():
     form = ShowForm()
@@ -37,8 +40,18 @@ def create_show_submission():
         try:
             artist = Artist.query.get(form.artist_id.data)
             venue = Venue.query.get(form.venue_id.data)
-            if not artist or not venue:
-                flash('Invalid artist or venue ID.')
+
+            requested_start_time = form.start_time.data
+            availability = Availability.query.filter(
+                and_(
+                    Availability.artist_id == artist.id,
+                    Availability.working_period_start <= requested_start_time,
+                    Availability.working_period_end >= requested_start_time
+                )
+            ).first()
+
+            if not availability:
+                flash(f'{artist.name} is not available at the requested time.')
                 return render_template('forms/new_show.html', form=form)
 
             new_show = Show(
@@ -48,18 +61,13 @@ def create_show_submission():
             )
             db.session.add(new_show)
             db.session.commit()
-            flash(
-                f'Show was successfully listed for {artist.name} at {venue.name}!')
             return redirect(url_for('shows.shows'))
+        
         except SQLAlchemyError as e:
             db.session.rollback()
             current_app.logger.error(f"Database error creating show: {str(e)}")
-            flash('An error occurred. Show could not be listed due to a database issue.')
+
+            return render_template('forms/new_show.html')
         finally:
             db.session.close()
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f"Error in {getattr(form, field).label.text}: {error}")
-    return render_template('forms/new_show.html', form=form)
-
+    

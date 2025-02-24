@@ -35,11 +35,13 @@ def create_app():
     from .blueprints.venues import venues_bp
     from .blueprints.artists import artists_bp
     from .blueprints.shows import shows_bp
+    from .blueprints.api import api_bp
 
     app.register_blueprint(main_bp, url_prefix='/home')
     app.register_blueprint(venues_bp,url_prefix='/venues')
     app.register_blueprint(artists_bp,url_prefix='/artists')
     app.register_blueprint(shows_bp, url_prefix='/shows')
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     # Error handlers
     @app.errorhandler(404)

@@ -13,12 +13,23 @@ from . import venues_bp
 @venues_bp.route('/venues')
 def venues():
     try:
-        data = Venue.query.order_by(desc(Venue.created_at)).limit(10).all()
-        print(data)
-        return render_template('pages/venues.html', areas=data)
+        # Query for unique city-state pairs
+        locations = db.session.query(Venue.city, Venue.state).distinct().all()
+
+        areas = []
+        for city, state in locations:
+            venues = Venue.query.filter_by(city=city, state=state).all()
+            print(f"City: {city}, State: {state}, Venues: {venues}")  # Debugging output
+            if venues:  # Only add areas with venues
+                areas.append({
+                    "city": city,
+                    "state": state,
+                    "venues": venues
+                })
+
+        return render_template('pages/venues.html', areas=areas)
 
     except Exception as e:
-
         print(f"Error retrieving venues: {e}")
         return render_template('errors/500.html'), 500
 
