@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 @shows_bp.route('/')
 def shows():
+    """ Shows all current shows on the page """
     shows = db.session.query(Show, Venue, Artist).join(
         Venue).join(Artist).all()
     data = []
@@ -25,16 +26,14 @@ def shows():
 
 @shows_bp.route('/create')
 def create_shows():
-    # renders form. do not touch.
     form = ShowForm()
 
     return render_template('forms/new_show.html', form=form)
 
 
-from flask import jsonify
-
 @shows_bp.route('/create', methods=['POST'])
 def create_show_submission():
+    """ Creates a show checking against availability of the artists. """
     form = ShowForm()
     if form.validate_on_submit():
         try:

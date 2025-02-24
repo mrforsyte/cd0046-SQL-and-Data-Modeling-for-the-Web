@@ -2,8 +2,9 @@ from flask import Blueprint, current_app, render_template
 from jinja2 import TemplateNotFound
 from . import main_bp
 
-
-
+"""
+    Render the home page of the application.
+"""
 
 @main_bp.route('/')
 def index():

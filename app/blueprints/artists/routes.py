@@ -9,9 +9,6 @@ from datetime import datetime
 @artists_bp.route('/artists/create', methods=['GET'])
 def create_artist_form():
     """Render the form for creating a new artist.
-
-    Returns:
-        str: Rendered HTML template for the new artist form.
     """
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
@@ -19,12 +16,6 @@ def create_artist_form():
 @artists_bp.route('/artists/create', methods=['POST'])
 def create_artist_submission():
     """Handle the submission of a new artist form.
-
-    Attempts to create a new artist in the database. If successful, redirects to
-    add availability. If unsuccessful, displays error messages.
-
-    Returns:
-        flask.Response: Redirect to add availability or rendered home page.
     """
     form = ArtistForm()
     if form.validate_on_submit():
@@ -58,11 +49,6 @@ def create_artist_submission():
 @artists_bp.route('/artists')
 def artists():
     """Retrieve and display a list of artists.
-
-    Fetches the 10 most recent artists from the database and renders them.
-
-    Returns:
-        str: Rendered HTML template with list of artists or error page.
     """
     try:
         data = Artist.query.order_by(desc(Artist.id)).limit(10).all()
@@ -74,12 +60,6 @@ def artists():
 @artists_bp.route('/artists/search', methods=['POST'])
 def search_artists():
     """Search for artists based on a search term.
-
-    Searches for artists whose names contain the given search term and returns
-    the results along with the count of upcoming shows for each artist.
-
-    Returns:
-        str: Rendered HTML template with search results or error page.
     """
     try:
         search_term = request.form.get('search_term', '')
@@ -107,14 +87,6 @@ def search_artists():
 @artists_bp.route('/<int:artist_id>')
 def show_artist(artist_id):
     """Display details of a specific artist.
-
-    Retrieves an artist by ID and renders their details, including upcoming and past shows.
-
-    Args:
-        artist_id (int): The ID of the artist to display.
-
-    Returns:
-        str: Rendered HTML template with artist details or error page.
     """
     try:
         artist = Artist.query.get_or_404(artist_id)
@@ -128,14 +100,6 @@ def show_artist(artist_id):
 @artists_bp.route('/<int:artist_id>/edit', methods=['GET', 'POST'])
 def edit_artist(artist_id):
     """Edit an existing artist's details.
-
-    Renders a form to edit an artist's details and handles form submission.
-
-    Args:
-        artist_id (int): The ID of the artist to edit.
-
-    Returns:
-        str: Rendered HTML template for editing or redirect after successful update.
     """
     artist = Artist.query.get_or_404(artist_id)
     form = ArtistForm(obj=artist)
@@ -157,14 +121,6 @@ def edit_artist(artist_id):
 @artists_bp.route('/<int:artist_id>/edit/availability', methods=['GET', 'POST'])
 def edit_artist_availability(artist_id):
     """Edit an artist's availability.
-
-    Renders a form to edit an artist's availability and handles form submission.
-
-    Args:
-        artist_id (int): The ID of the artist whose availability is being edited.
-
-    Returns:
-        str: Rendered HTML template for editing availability or redirect after successful update.
     """
     artist = Artist.query.get_or_404(artist_id)
     availability = Availability.query.filter_by(artist_id=artist_id).first()
@@ -191,16 +147,8 @@ def edit_artist_availability(artist_id):
 
 @artists_bp.route('/<int:artist_id>/availability/add', methods=["GET","POST"])
 def add_availability(artist_id):
-    """Add availability for an artist.
+    """Add availability for an artist."""
 
-    Renders a form to add availability for an artist and handles form submission.
-
-    Args:
-        artist_id (int): The ID of the artist for whom availability is being added.
-
-    Returns:
-        str: Rendered HTML template for adding availability or redirect after successful addition.
-    """
     artist = Artist.query.get_or_404(artist_id)
     form = AvailabilityForm()
 

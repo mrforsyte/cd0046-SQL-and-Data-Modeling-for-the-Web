@@ -12,6 +12,7 @@ from . import venues_bp
 
 @venues_bp.route('/venues')
 def venues():
+    """ Shows all current venues in database and groups them by city and state. """
     try:
         locations = db.session.query(Venue.city, Venue.state).distinct().all()
 
@@ -49,6 +50,8 @@ def venues():
 
 @venues_bp.route('/search', methods=['POST'])
 def search_venues():
+    """ Searches for venues. """
+
     search_term = request.form.get('search_term', '')
     current_time = datetime.now()
 
@@ -77,6 +80,8 @@ def search_venues():
 
 @venues_bp.route('/<int:venue_id>')
 def show_venue(venue_id):
+    """ Shows specific venue with a given id """
+
     try:
 
         data = Venue.query.get(venue_id)
@@ -96,6 +101,7 @@ def create_venue_form():
 
 @venues_bp.route('/create', methods=['POST'])
 def create_venue_submission():
+    """ Creates a venue """
     venue_form = VenueForm()
     if venue_form.validate_on_submit():
         try:
@@ -133,6 +139,7 @@ def create_venue_submission():
 
 @venues_bp.route('/venues/<venue_id>', methods=['POST', 'DELETE'])
 def delete_venue(venue_id):
+    """ Delets a venue"""
     try:
 
         item_to_delete = db.session.query(Venue).get(venue_id)
@@ -155,6 +162,7 @@ def delete_venue(venue_id):
 
 @venues_bp.route('/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
+    """ Edits a venue with given id. """
     record = Venue.query.get_or_404(venue_id)
     form = VenueForm(obj=record)
 
