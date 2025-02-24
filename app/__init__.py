@@ -6,27 +6,48 @@ from .utils import format_datetime
 from jinja2 import Environment, FileSystemLoader
 
 def create_app():
+    """
+    Create and configure an instance of the Flask application.
+
+    This function sets up the Flask app, including:
+    - Configuration
+    - Database initialization
+    - Custom Jinja2 filters
+    - Blueprint registration
+    - Error handlers
+    - Logging (in non-debug mode)
+
+    Returns:
+        Flask: The configured Flask application instance.
+    """
 
     app = Flask(__name__)
     app.config.from_object('config')
 
-   # Define a custom filter
     def startswith(string, prefix):
+        """
+        Custom Jinja2 filter to check if a string starts with a given prefix.
+
+        Args:
+            string (str): The string to check.
+            prefix (str): The prefix to look for.
+
+        Returns:
+            bool: True if the string starts with the prefix, False otherwise.
+        """
         if string is None:
             return False
         return string.startswith(prefix)
 
-    # Create a Jinja2 environment
     env = Environment(loader=FileSystemLoader('templates'))
     env.filters['startswith'] = startswith
 
-    # Now you can use the startswith filter in your templates
-
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     moment.init_app(app)
 
-    # Register Jinja2 filter
+    # Register custom Jinja2 filters
     app.jinja_env.filters['datetime'] = format_datetime
     app.jinja_env.filters['startswith'] = startswith
 
@@ -38,21 +59,23 @@ def create_app():
     from .blueprints.api import api_bp
 
     app.register_blueprint(main_bp, url_prefix='/home')
-    app.register_blueprint(venues_bp,url_prefix='/venues')
-    app.register_blueprint(artists_bp,url_prefix='/artists')
+    app.register_blueprint(venues_bp, url_prefix='/venues')
+    app.register_blueprint(artists_bp, url_prefix='/artists')
     app.register_blueprint(shows_bp, url_prefix='/shows')
     app.register_blueprint(api_bp, url_prefix='/api')
 
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
+        """Handle 404 errors by rendering a custom error page."""
         return render_template('errors/404.html'), 404
 
     @app.errorhandler(500)
     def server_error(error):
+        """Handle 500 errors by rendering a custom error page."""
         return render_template('errors/500.html'), 500
 
-    # Logging setup
+    # Configure logging for production mode
     if not app.debug:
         file_handler = FileHandler('error.log')
         file_handler.setFormatter(Formatter(
@@ -63,8 +86,3 @@ def create_app():
         app.logger.info('errors')
 
     return app
-
-
-
-
-

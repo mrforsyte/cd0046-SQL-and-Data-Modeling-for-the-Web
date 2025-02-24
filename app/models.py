@@ -2,9 +2,6 @@ from .extensions import db
 from sqlalchemy import func, and_
 from datetime import datetime
 
-# ----------------------------------------------------------------------------#
-# Models.
-# ----------------------------------------------------------------------------#
 
 class Venue(db.Model):
     __tablename__ = 'venue'

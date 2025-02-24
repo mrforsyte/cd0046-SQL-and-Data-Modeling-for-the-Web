@@ -1,6 +1,10 @@
 from app import create_app
 import os
 
+""" This script is the entry point for running the Flask application. It sets up the port
+    and host for the development server and runs the app in debug mode.
+"""
+
 app = create_app()
 
 if __name__ == '__main__':

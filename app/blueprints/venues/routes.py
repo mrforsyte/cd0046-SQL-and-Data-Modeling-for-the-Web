@@ -13,17 +13,15 @@ from . import venues_bp
 @venues_bp.route('/venues')
 def venues():
     try:
-        # Query for unique city-state pairs
         locations = db.session.query(Venue.city, Venue.state).distinct().all()
 
         areas = []
         for city, state in locations:
-            # Filter venues by city and state
             venues = Venue.query.filter(Venue.city == city, Venue.state == state).all()
-            if venues:  # Only add areas with venues
+            if venues:  
                 venue_data = []
                 for venue in venues:
-                    # Calculate past and upcoming shows
+                   
                     past_shows = venue.get_past_shows()
                     upcoming_shows = venue.get_upcoming_shows()
 
@@ -43,7 +41,6 @@ def venues():
         return render_template('pages/venues.html', areas=areas)
 
     except Exception as e:
-        # Log the error (optional: use Flask's logger)
         print(f"Error retrieving venues: {e}")
         return render_template('errors/500.html'), 500
     
@@ -90,8 +87,6 @@ def show_venue(venue_id):
         return render_template('errors/500.html'), 500
 
 
-#  Create Venue
-#  ----------------------------------------------------------------
 
 @venues_bp.route('/venues/create', methods=['GET'])
 def create_venue_form():
@@ -156,8 +151,7 @@ def delete_venue(venue_id):
 
     return redirect(url_for('venues.venues'))
 
-#  Artists
-#  ----------------------------------------------------------------
+
 
 @venues_bp.route('/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
