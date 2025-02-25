@@ -52,6 +52,18 @@ def create_show_submission():
             if not availability:
                 flash(f'{artist.name} is not available at the requested time.')
                 return render_template('forms/new_show.html', form=form)
+            
+            existing_show = Show.query.filter(
+                and_(
+                    Show.artist_id == artist.id,
+                    Show.venue_id==venue.id,
+                    Show.start_time == requested_start_time
+                )
+            ).first()
+
+            if existing_show:
+                flash(f'{artist.name} is alas busy at this time')
+                return render_template('forms/new_show.html',form=form)
 
             new_show = Show(
                 artist_id=artist.id,
@@ -65,8 +77,7 @@ def create_show_submission():
         except SQLAlchemyError as e:
             db.session.rollback()
             current_app.logger.error(f"Database error creating show: {str(e)}")
-
-            return render_template('forms/new_show.html')
+            return render_template('forms/new_show.html', form=form)
         finally:
             db.session.close()
     

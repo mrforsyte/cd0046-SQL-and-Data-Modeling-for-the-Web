@@ -15,7 +15,7 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website = db.Column(db.String(120))
-    seeking_talent = db.Column(db.Boolean, default=False)
+    seeking_talent = db.Column(db.Boolean, default=False,nullable=False)
     seeking_description = db.Column(db.String(500))
     genres = db.Column(db.ARRAY(db.String(50)))
     shows = db.relationship('Show', back_populates='venue',lazy='dynamic')
@@ -28,35 +28,27 @@ class Venue(db.Model):
     def __repr__(self):
         return f'<Vanue {self.id} {self.name}>'
     
-    def get_upcoming_shows(self):
-        """Retrieve all upcoming shows for this venue."""
-        upcoming_shows = self.shows.filter(Show.start_time > datetime.now()).all()
-        return [{
-            "artist_id": show.artist.id,
-            "artist_name": show.artist.name,
-            "artist_image_link": show.artist.image_link,
-            "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
-        } for show in upcoming_shows]
-
     def get_past_shows(self):
         """Retrieve all past shows for this venue."""
-        past_shows = self.shows.filter(Show.start_time <= datetime.now()).all()
-        return [{
-            "artist_id": show.artist.id,
-            "artist_name": show.artist.name,
-            "artist_image_link": show.artist.image_link,
-            "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
-        } for show in past_shows]
+        return db.session.query(Show).join(Venue).filter(
+            Show.venue_id == self.id,
+            Show.start_time < datetime.now()
+        ).all()
 
-    @property
-    def upcoming_shows_count(self):
-        """Count the number of upcoming shows."""
-        return self.shows.filter(Show.start_time > datetime.now()).count()
+    def get_upcoming_shows(self):
+        """Retrieve all upcoming shows for this venue."""
+        return db.session.query(Show).join(Venue).filter(
+            Show.venue_id == self.id,
+            Show.start_time >= datetime.now()
+        ).all()
 
     @property
     def past_shows_count(self):
-        """Count the number of past shows."""
-        return self.shows.filter(Show.start_time <= datetime.now()).count()
+        return len(self.get_past_shows())
+    
+    @property
+    def upcoming_shows_count(self):
+        return len(self.get_upcoming_shows())
 
 
 class Artist(db.Model):
@@ -81,21 +73,26 @@ class Artist(db.Model):
     
 
     def get_past_shows(self):
-        current_time = datetime.now()
-        return Show.query.filter(Show.venue_id == self.id, Show.start_time < current_time).all()
+        """Retrieve all past shows for this artist."""
+        return db.session.query(Show).join(Artist).filter(
+            Show.artist_id == self.id,
+            Show.start_time < datetime.now()
+        ).all()
 
     def get_upcoming_shows(self):
-        current_time = datetime.now()
-        return Show.query.filter(Show.venue_id == self.id, Show.start_time >= current_time).all()
+        """Retrieve all upcoming shows for this artist."""
+        return db.session.query(Show).join(Artist).filter(
+            Show.artist_id == self.id,
+            Show.start_time >= datetime.now()
+        ).all()
 
     @property
     def upcoming_shows_count(self):
-        return Show.query.filter(Show.artist_id == self.id, Show.start_time > datetime.now()).count()
+        return self.shows.filter(Show.start_time > datetime.now()).count()
 
     @property
     def past_shows_count(self):
-        return Show.query.filter(Show.artist_id == self.id, Show.start_time <= datetime.now()).count()
-
+        return self.shows.filter(Show.start_time <= datetime.now()).count()
 
 class Show(db.Model):
     __tablename__ = 'shows'

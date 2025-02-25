@@ -17,7 +17,7 @@ def create_artist_form():
 def create_artist_submission():
     """Handle the submission of a new artist form.
     """
-    form = ArtistForm()
+    form = ArtistForm(request.form)
     if form.validate_on_submit():
         try:
             new_artist = Artist(
@@ -27,7 +27,9 @@ def create_artist_submission():
                 phone=form.phone.data,
                 genres=form.genres.data,
                 facebook_link=form.facebook_link.data,
-                image_link=form.image_link.data
+                image_link=form.image_link.data,
+                seeking_venue=form.seeking_venue.data,
+                seeking_description = form.seeking_description.data 
             )
             db.session.add(new_artist)
             db.session.commit()
@@ -90,12 +92,43 @@ def show_artist(artist_id):
     """
     try:
         artist = Artist.query.get_or_404(artist_id)
-        artist.upcoming_shows = artist.get_upcoming_shows()
-        artist.past_shows = artist.get_past_shows()
-        return render_template('pages/show_artist.html', artist=artist)
+        # Fetch past and upcoming shows using model methods
+        past_shows = artist.get_past_shows()
+        upcoming_shows = artist.get_upcoming_shows()
+
+        # Prepare data for rendering
+        artist_data = {
+            "id": artist.id,
+            "name": artist.name,
+            "genres": artist.genres,
+            "city": artist.city,
+            "state": artist.state,
+            "phone": artist.phone,
+            "facebook_link": artist.facebook_link,
+            "seeking_venue": artist.seeking_venue,
+            "seeking_description": artist.seeking_description,
+            "image_link": artist.image_link,
+            "past_shows": [{
+                "venue_id": show.venue_id,
+                "venue_name": show.venue.name,
+                "venue_image_link": show.venue.image_link,
+                "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+            } for show in past_shows],
+            "upcoming_shows": [{
+                "venue_id": show.venue_id,
+                "venue_name": show.venue.name,
+                "venue_image_link": show.venue.image_link,
+                "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+            } for show in upcoming_shows],
+            "past_shows_count": len(past_shows),
+            "upcoming_shows_count": len(upcoming_shows)
+        }
+
+        # Render template with data
+        return render_template('pages/show_artist.html', artist=artist_data)
     except Exception as e:
         print(f'Error occurred while retrieving artists: {str(e)}')
-        return render_template('500.html'), 500
+        return render_template('errors/500.html'), 500
 
 @artists_bp.route('/<int:artist_id>/edit', methods=['GET', 'POST'])
 def edit_artist(artist_id):

@@ -80,15 +80,48 @@ def search_venues():
 
 @venues_bp.route('/<int:venue_id>')
 def show_venue(venue_id):
-    """ Shows specific venue with a given id """
-
+    """Shows specific venue with a given id."""
     try:
+        venue = Venue.query.get_or_404(venue_id)
+        
+        # Fetch past and upcoming shows using the updated methods
+        past_shows = venue.get_past_shows()
+        upcoming_shows = venue.get_upcoming_shows()
 
-        data = Venue.query.get(venue_id)
-        return render_template('pages/show_venue.html', venue=data)
+        # Prepare data for rendering
+        venue_data = {
+            "id": venue.id,
+            "name": venue.name,
+            "genres": venue.genres,
+            "address": venue.address,
+            "city": venue.city,
+            "state": venue.state,
+            "phone": venue.phone,
+            "website": venue.website,
+            "facebook_link": venue.facebook_link,
+            "seeking_talent": venue.seeking_talent,
+            "seeking_description": venue.seeking_description,
+            "image_link": venue.image_link,
+            "past_shows": [{
+                "artist_id": show.artist_id,
+                "artist_name": show.artist.name,
+                "artist_image_link": show.artist.image_link,
+                "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+            } for show in past_shows],
+            "upcoming_shows": [{
+                "artist_id": show.artist_id,
+                "artist_name": show.artist.name,
+                "artist_image_link": show.artist.image_link,
+                "start_time": show.start_time.strftime('%Y-%m-%d %H:%M:%S')
+            } for show in upcoming_shows],
+            "past_shows_count": len(past_shows),
+            "upcoming_shows_count": len(upcoming_shows)
+        }
+
+        return render_template('pages/show_venue.html', venue=venue_data)
+    
     except Exception as e:
-
-        print(f"Error retrieving venue with {venue_id} id: {e}")
+        current_app.logger.error(f"Error retrieving venue with ID {venue_id}: {str(e)}")
         return render_template('errors/500.html'), 500
 
 
@@ -102,7 +135,7 @@ def create_venue_form():
 @venues_bp.route('/create', methods=['POST'])
 def create_venue_submission():
     """ Creates a venue """
-    venue_form = VenueForm()
+    venue_form = VenueForm(request.form)
     if venue_form.validate_on_submit():
         try:
             new_venue = Venue(
@@ -114,8 +147,11 @@ def create_venue_submission():
                 genres=venue_form.genres.data,
                 facebook_link=venue_form.facebook_link.data,
                 image_link=venue_form.image_link.data,
-                website=venue_form.website_link.data
+                website=venue_form.website_link.data,
+                seeking_description=venue_form.seeking_description.data,
+                seeking_talent=venue_form.seeking_talent.data
             )
+
             db.session.add(new_venue)
             db.session.commit()
             flash('Venue ' + request.form['name'] + ' was successfully listed!')
